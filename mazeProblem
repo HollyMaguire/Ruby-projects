@@ -1,0 +1,76 @@
+input = 
+"5 5
+....*
+****.
+.....
+.##.#
+....."
+
+
+def main(input)
+    min_distances = []
+    for each in ["*", "#"]
+        conversion = convert_to_adjacency_list(input, each)
+        adjacency_list,length,width =  conversion[:adjacency_list], conversion[:length],conversion[:width]
+        distances = dfs(input, adjacency_list)
+        path_length = distances[[length - 1, width - 1]] ? distances[[length - 1, width - 1]] : -1
+        min_distances.push(path_length)
+    end
+    puts min_distances
+end
+
+def valid_index(length, width, i, j, arr)
+    i < length && i >= 0 && j< width && j >=0 && arr[i][j] == '.'
+end
+
+def convert_to_adjacency_list(input, substitute)
+    input = input.gsub(substitute, '.')
+    input = input.split(' ')
+    length = input.shift.to_i
+    width = input.shift.to_i
+    input = input.map{ |i| i.split('') }
+    adjacency_list = {}
+    length.times do |i|
+        width.times do |j|
+            adjacent_elements = []
+            if (valid_index(length, width, i+1, j,input))
+                adjacent_elements.push([i+1, j])
+            end
+            if (valid_index(length, width, i-1, j,input))
+                adjacent_elements.push([i-1, j])
+            end
+            if (valid_index(length, width, i, j+1,input))
+                adjacent_elements.push([i, j+1])
+            end
+            if (valid_index(length, width, i, j-1,input))
+                adjacent_elements.push([i, j-1])
+            end
+            adjacency_list[[i,j]] = adjacent_elements
+        end
+    end
+    {adjacency_list: adjacency_list,length: length,width: width}
+end
+
+def dfs(input, adjacency_matrix)
+    visited = []
+    distances = {}
+    nodes = adjacency_matrix.keys
+    queue = [[0,0]]
+    distances[[0,0]] = 0
+    visited.push([0,0])
+   until(queue.empty?)
+    current_node = queue.shift
+    for node in adjacency_matrix[current_node]
+        unless(visited.include?(node))
+            distances[node] = distances[current_node] + 1
+            visited.push(node)
+            queue.push(node)
+        end
+    end
+
+   end
+   distances
+end
+
+
+main(input)
